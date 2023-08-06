@@ -98,6 +98,7 @@
         if(cache[o]) return cache[o];
         xhr._open("GET",o,false);
         xhr._send()
+	if(xhr.status >= 400) return "";
         var k = toU8Array(xhr.responseText);
         _hashkeyl.set(md5.array(hashfilename(t)))
         stream_xor(k,_hashkeyl,_hashkeyr);
@@ -119,6 +120,7 @@
         }
         xhr._send()
         xhr.onload = function(){
+	    if(xhr.status >= 400) return "";
             var k = new Uint8Array(xhr.response);
             _hashkeyl.set(md5.array(hashfilename(t)))
             stream_xor(k,_hashkeyl,_hashkeyr);
@@ -169,7 +171,7 @@
                 return new Promise(function(res,rej){
                     var o = hexfile(url);
                     if(cache[o]) return res(_fetch(cache[o]));
-                    _fetch(hexfile(url)).then(function(a){
+                    _fetch(o).then(function(a){
                         return a.arrayBuffer()
                     }).then(function(b){
                         var k = new Uint8Array(b);
