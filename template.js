@@ -167,14 +167,16 @@
                 return _fetch(url,param);
             }else{
                 return new Promise(function(res,rej){
+                    var o = hexfile(url);
+                    if(cache[o]) return res(_fetch(cache[o]));
                     _fetch(hexfile(url)).then(function(a){
                         return a.arrayBuffer()
                     }).then(function(b){
                         var k = new Uint8Array(b);
                         _hashkeyl.set(md5.array(hashfilename(url)))
                         stream_xor(k,_hashkeyl,_hashkeyr);
-                        var e =  decompress(k);
-                        res(_fetch(tolink(e)))
+                        cache[o] = toURL(decompress(k));
+                        res(_fetch(cache[o]))
                     }).catch(function(e){
                         rej(e);
                     })
