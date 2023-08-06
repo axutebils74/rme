@@ -56,7 +56,7 @@
     XMLHttpRequest.prototype._open = XMLHttpRequest.prototype.open
     XMLHttpRequest.prototype._send = XMLHttpRequest.prototype.send
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "./index.html", false);
+    xhr.open("GET", ".", false);
     xhr.send();
     var text = xhr.response;
     if(document.scripts.length > 2) {document.documentElement.innerHTML = "<h1>\u8BF7\u5173\u95ED\u63D2\u4EF6<h1><a href='.'>\u8FD4\u56DE</a>"; return}
