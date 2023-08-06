@@ -62,6 +62,7 @@
     if(document.scripts.length > 2) {document.documentElement.innerHTML = "<h1>\u8BF7\u5173\u95ED\u63D2\u4EF6<h1><a href='.'>\u8FD4\u56DE</a>"; return}
     var script = md5.hex(document.scripts[0].text) +md5.hex(text) + md5.hex(document.scripts[1].text);
     var element = document.createElement('a');
+	    var cache = {};
 	function getURL(e) {
 		element.href = e;
 		return element.href
@@ -87,23 +88,30 @@
         }
         return bufView
     }
+    function toURL(a){
+        return URL.createObjectURL(new Blob([a]));
+    }
     function requestAsyc(t){
         var xhr = new XMLHttpRequest()
         xhr.overrideMimeType('text/plain; charset=ISO-8859-15');
-        xhr._open("GET",hexfile(t),false);
+        var o = hexfile(t);
+        if(cache[o]) return cache[o];
+        xhr._open("GET",o,false);
         xhr._send()
         var k = toU8Array(xhr.responseText);
         _hashkeyl.set(md5.array(hashfilename(t)))
         stream_xor(k,_hashkeyl,_hashkeyr);
-        return decompress(k);
+        return cache[o] = toURL(decompress(k));
     }
     function tolink(a){
-        return URL.createObjectURL(new Blob([a]));
+       return a;
     }
     function request(t,fn,err){
         var xhr = new XMLHttpRequest()
         xhr.responseType = "arraybuffer";
-        xhr._open("GET",hexfile(t));
+        var o = hexfile(t);
+        if(cache[o]) return fn(cache[o]);
+        xhr._open("GET",o);
         if(err){
             xhr.ontimeout = function(e){return err(0,e)}
             xhr.onabort = function(e){return err(1,e)}
@@ -115,7 +123,7 @@
             _hashkeyl.set(md5.array(hashfilename(t)))
             stream_xor(k,_hashkeyl,_hashkeyr);
             var e =  decompress(k);
-            fn(e);
+            fn(cache[o] = toURL(e));
         }
     }
 	XMLHttpRequest.prototype.open = function (m, u, a) {
