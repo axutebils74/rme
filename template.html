@@ -20,7 +20,7 @@
         if (!hash) { show("无效密码"); return; }
         var xhr = new XMLHttpRequest();
         xhr.responseType = "arraybuffer";
-        xhr.open("POST", "index.js");
+        xhr.open("GET", "index.js");
         xhr.send();
         xhr.onload = function () {
             var x = new Uint8Array(xhr.response);
