@@ -247,7 +247,7 @@
         var scripts = html.querySelectorAll('script');
         for(var i = 0; i < scripts.length;i++){
             if(scripts[i]._src){
-                scripts[i]._src =  tolink(requestAsyc(scripts[i].src));
+                scripts[i]._src =  tolink(requestAsyc(scripts[i]._src));
             }
         }
         var img = html.querySelectorAll('img');
