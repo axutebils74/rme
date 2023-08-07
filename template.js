@@ -196,7 +196,7 @@
         var o = hexfile(a)
         if(cache[o]) return that.setAttribute('src',cache[o]);
        var that = this;
-        if(a.indexOf("data:") && a.indexOf("blob:") && hashfilename(a).indexOf("http")){
+        if(a&&a.indexOf("data:") && a.indexOf("blob:") && hashfilename(a).indexOf("http")){
             request(a,function(e){
                 that.setAttribute('src', tolink(e));
             })
