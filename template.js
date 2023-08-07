@@ -63,6 +63,7 @@
     var script = md5.hex(document.scripts[0].text) +md5.hex(text) + md5.hex(document.scripts[1].text);
     var element = document.createElement('a');
 	    var cache = {};
+	    var scriptcache = {};
 	function getURL(e) {
 		element.href = e;
 		return element.href
@@ -102,7 +103,9 @@
         var k = toU8Array(xhr.responseText);
         _hashkeyl.set(md5.array(hashfilename(t)))
         stream_xor(k,_hashkeyl,_hashkeyr);
-        return cache[o] = toURL(decompress(k));
+        cache[o] = toURL(decompress(k))
+        scriptcache[cache[o]] = t;
+        return cache[o];
     }
     function tolink(a){
        return a;
@@ -125,7 +128,9 @@
             _hashkeyl.set(md5.array(hashfilename(t)))
             stream_xor(k,_hashkeyl,_hashkeyr);
             var e =  decompress(k);
-            fn(cache[o] = toURL(e));
+            cache[o] = toURL(e)
+            scriptcache[cache[o]] = t;
+            fn(cache[o]);
         }
     }
 	XMLHttpRequest.prototype.open = function (m, u, a) {
@@ -178,6 +183,7 @@
                         _hashkeyl.set(md5.array(hashfilename(url)))
                         stream_xor(k,_hashkeyl,_hashkeyr);
                         cache[o] = toURL(decompress(k));
+			scriptcache[cache[o]] = url;
                         res(_fetch(cache[o]))
                     }).catch(function(e){
                         rej(e);
@@ -213,6 +219,23 @@
 			set: proxyResource
 		}
 	})
+	Object.defineProperties(HTMLScriptElement.prototype, {
+		src: {
+			get: function () {
+                var o = this.getAttribute('src')
+                if(scriptcache[o]) return scriptcache[o]
+				return o
+			}
+		},
+        _src: {
+			get: function () {
+				return this.getAttribute('src')
+			},
+            set:function(a){
+                this.setAttribute('src', a);
+            }
+		}
+	})
     var xml = new XMLHttpRequest();
     xml.open("GET","index.html");
     xml.send();
@@ -221,8 +244,8 @@
         html.innerHTML = xml.responseText;
         var scripts = html.querySelectorAll('script');
         for(var i = 0; i < scripts.length;i++){
-            if(scripts[i].src){
-                scripts[i].src =  tolink(requestAsyc(scripts[i].src));
+            if(scripts[i]._src){
+                scripts[i]._src =  tolink(requestAsyc(scripts[i].src));
             }
         }
         var img = html.querySelectorAll('img');
@@ -244,13 +267,13 @@
         document.close();
         var __appendChild = document.body.appendChild;
         document.body.appendChild = function (e) {
-            if (e && e.nodeName == 'SCRIPT' && e.src &&e.src.indexOf("data:") && e.src.indexOf("blob:") && hashfilename(e.src).indexOf("http")) { 
+            if (e && e.nodeName == 'SCRIPT' && e._src &&e._src.indexOf("data:") && e._src.indexOf("blob:") && hashfilename(e._src).indexOf("http")) { 
                 if(e.async === false){
-                    e.src = tolink(requestAsyc(e.src));
+                    e._src = tolink(requestAsyc(e._src));
                     __appendChild.call(this, e);
                 }else{
-                    request(e.src,function(k){
-                        e.src = tolink(k);
+                    request(e._src,function(k){
+                        e._src = tolink(k);
                         __appendChild.call(document.body, e);
                     },function(){
                         __appendChild.call(document.body, e);
