@@ -140,6 +140,16 @@ function getBase(){
         }
     }
 }
+var element = document.createElement('a');
+function getURL(e) {
+    element.href = e;
+    return element.href
+}
+var base1 = getURL(".");
+function hashfilename(t) {
+    var r = getURL(t).replace(base1,"").toLowerCase();
+    return decodeURIComponent(r);
+}
 f.oninput =async function(){
     btn.hidden = 'hidden'
     if(f.value){
@@ -151,7 +161,7 @@ f.oninput =async function(){
         files = f.files;
         getBase();
         for(var i = 0;i < files.length;i++){
-            files[i].path = encodeURI(files[i].webkitRelativePath.slice(base.length));
+            files[i].path = hashfilename(files[i].webkitRelativePath.slice(base.length));
         }
         for(var i = 0;i < files.length;i++){
             div.innerHTML = i + '/' + files.length ;
