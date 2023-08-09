@@ -71,7 +71,7 @@
 	var base = getURL(".");
     function hashfilename(t) {
 		var r = getURL(t).replace(base,"").toLowerCase().replace(/[#|?][^]*$/,"");
-        return r;
+        return decodeURIComponent(r);
 	}
     function hexfile(t) {
 		return "./data/" + md5.hex(script + hashfilename(t));
@@ -170,9 +170,7 @@
         var _fetch = fetch;
         fetch = function(url,param){
             if(typeof url === 'object') return _fetch(url);
-            if(url.indexOf('data:') == 0 || url.indexOf('blob:') == 0 || hashfilename(url).indexOf("http") == 0){
-                return _fetch(url,param);
-            }else{
+            if(url&&url.indexOf('data:')&&url.indexOf('blob:')&&hashfilename(url).indexOf("http")){
                 return new Promise(function(res,rej){
                     var o = hexfile(url);
                     if(cache[o]) return res(_fetch(cache[o]));
@@ -183,12 +181,14 @@
                         _hashkeyl.set(md5.array(hashfilename(url)))
                         stream_xor(k,_hashkeyl,_hashkeyr);
                         cache[o] = toURL(decompress(k));
-			scriptcache[cache[o]] = url;
+                        scriptcache[cache[o]] = url;
                         res(_fetch(cache[o]))
                     }).catch(function(e){
                         rej(e);
                     })
                 })
+            }else{
+                return _fetch(url,param);
             }
         }
     }
@@ -264,12 +264,9 @@
             }
         }
         onerror = null; 
-        document.open();
-        document.write(html.innerHTML);
-        document.close();
-        var __appendChild = document.body.appendChild;
-        document.body.appendChild = function (e) {
-            if (e && e.nodeName == 'SCRIPT' && e._src &&e._src.indexOf("data:") && e._src.indexOf("blob:") && hashfilename(e._src).indexOf("http")) { 
+	var __appendChild = Node.prototype.appendChild;
+        Node.prototype.appendChild = function (e) {
+            if (this === document.body && e && e.nodeName == 'SCRIPT' && e._src &&e._src.indexOf("data:") && e._src.indexOf("blob:") && hashfilename(e._src).indexOf("http")) { 
                 if(e.async === false){
                     e._src = tolink(requestAsyc(e._src));
                     __appendChild.call(this, e);
@@ -281,9 +278,13 @@
                         __appendChild.call(document.body, e);
                     })
                 }
+                return e;
             }else{
-                __appendChild.call(this, e);
+                return __appendChild.call(this, e);
             }
         }
+        document.open();
+        document.write(html.innerHTML);
+        document.close();
     }
 })();
