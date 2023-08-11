@@ -1,5 +1,6 @@
 # 引用
 ### LZMA
+[https://github.com/jcmellado/js-lzma](https://github.com/jcmellado/js-lzma)
 [https://github.com/LZMA-JS/LZMA-JS](https://github.com/LZMA-JS/LZMA-JS)
 ### MD5
 [https://github.com/emn178/js-md5](https://github.com/emn178/js-md5)
