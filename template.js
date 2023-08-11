@@ -228,7 +228,7 @@ h;f++)b+=String.fromCharCode(a[d][f]);return b}})(l);return(function(c){var a=ne
 	Object.defineProperties(Image.prototype, {
 		src: {
 			get: function () {
-				return this.getAttribute('src')
+				return this.getAttribute('src')||""
 			},
 			set: proxyResource
         }
@@ -236,7 +236,7 @@ h;f++)b+=String.fromCharCode(a[d][f]);return b}})(l);return(function(c){var a=ne
 	Object.defineProperties(Audio.prototype, {
 		src: {
 			get: function () {
-				return this.getAttribute('src')
+				return this.getAttribute('src')||""
 			},
 			set: proxyResource
 		}
@@ -246,12 +246,12 @@ h;f++)b+=String.fromCharCode(a[d][f]);return b}})(l);return(function(c){var a=ne
 			get: function () {
                 var o = this.getAttribute('src')
                 if(scriptcache[o]) return scriptcache[o]
-				return o
+				return o||""
 			}
 		},
         _src: {
 			get: function () {
-				return this.getAttribute('src')
+				return this.getAttribute('src')||""
 			},
             set:function(a){
                 this.setAttribute('src', a);
