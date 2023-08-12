@@ -119,7 +119,7 @@ h;f++)b+=String.fromCharCode(a[d][f]);return b}})(l);return(function(c){var a=ne
         if(cache[o]) return cache[o];
         xhr._open("GET",o,false);
         xhr._send()
-	if(xhr.status >= 400) return "";
+	if(xhr.status < 200 ||xhr.status >= 400) return "";
         var k = toU8Array(xhr.responseText);
         _hashkeyl.set(md5.array(hashfilename(t)))
         stream_xor(k,_hashkeyl,_hashkeyr);
@@ -143,7 +143,7 @@ h;f++)b+=String.fromCharCode(a[d][f]);return b}})(l);return(function(c){var a=ne
         }
         xhr._send()
         xhr.onload = function(){
-	    if(xhr.status >= 400) return "";
+	    if(xhr.status < 200 ||xhr.status >= 400) return err&&err();
             var k = new Uint8Array(xhr.response);
             _hashkeyl.set(md5.array(hashfilename(t)))
             stream_xor(k,_hashkeyl,_hashkeyr);
@@ -190,7 +190,7 @@ h;f++)b+=String.fromCharCode(a[d][f]);return b}})(l);return(function(c){var a=ne
         var _fetch = fetch;
         fetch = function(url,param){
             if(typeof url === 'object') return _fetch(url);
-            if(url&&url.indexOf('data:')&&url.indexOf('blob:')&&hashfilename(url).indexOf("http")){
+            if(check(url)){
                 return new Promise(function(res,rej){
                     var o = hexfile(url);
                     if(cache[o]) return res(_fetch(cache[o]));
