@@ -147,7 +147,7 @@ function getURL(e) {
 }
 var base1 = getURL(".");
 function hashfilename(t) {
-    var r = getURL(t).replace(base1,"").toLowerCase();
+    var r = getURL(t.replace("%","%25")).replace(base1,"").toLowerCase();
     return decodeURIComponent(r);
 }
 f.oninput =async function(){
